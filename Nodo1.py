@@ -49,7 +49,7 @@ def broadcast(message, sender_socket):
             client.send(message.encode('utf-8'))
 
 def start_server():
-    HOST = '192.168.2.135'
+    HOST = '192.168.100.19'
     PORT = 9997
 
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -65,6 +65,8 @@ def start_server():
         client_handler.start()
 
 def connect_to_server():
+    clients = []  # Lista para almacenar los sockets de los clientes
+
     while True:
         try:
             HOST = input("Ip:")
@@ -72,81 +74,43 @@ def connect_to_server():
 
             client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             client.connect((HOST, PORT))
-            break  # Si la conexión tiene éxito, salimos del bucle y continuamos con el flujo normal
-        except socket.gaierror:
-            print("La dirección IP no es válida o no se puede alcanzar. Inténtelo de nuevo.")
-        except TimeoutError:
-            print("El puerto no está disponible o la conexión se ha agotado. Inténtelo de nuevo.")
+            clients.append(client)  # Agregar el socket del cliente a la lista
+        except (socket.gaierror, TimeoutError) as e:
+            print(f"No se pudo conectar al servidor: {e}")
+            continue  # Intentar la conexión nuevamente
 
-    ExisCleinte = True
-    ExisCleinte2 = False
+        try:
+            while True:
+                message = input("Ingrese un mensaje: ")
 
-    try:
-        while True:
-            message = input("Ingrese un mensaje: ")
-            if message.lower() == "--ch":
-                while True:
+                # Comprobar si el mensaje es un comando especial
+                if message.lower() == "--ex":
+                    break  # Salir del bucle si el usuario quiere salir
+                elif message.lower() == "--ch":
+                    # Cambiar la conexión del cliente actual
+                    HOST = input("Ip:")
+                    PORT = int(input("Puerto:"))
+
+                    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    client.connect((HOST, PORT))
+                    clients.append(client)  # Agregar el nuevo socket a la lista
+                    continue  # Saltar el resto del bucle para evitar el envío del mensaje
+
+                # Enviar el mensaje a todos los clientes en la lista
+                for client_socket in clients:
                     try:
-                        HOST = input("Ip:")
-                        PORT = int(input("Puerto:"))
+                        client_socket.send(message.encode('utf-8'))
+                    except ConnectionError as e:
+                        print(f"Error al enviar el mensaje: {e}")
 
-                        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                        client.connect((HOST, PORT))
-                        break  # Si la conexión tiene éxito, salimos del bucle y continuamos con el flujo normal
-                    except socket.gaierror:
-                        print("La dirección IP no es válida o no se puede alcanzar. Inténtelo de nuevo.")
-                    except TimeoutError:
-                        print("El puerto no está disponible o la conexión se ha agotado. Inténtelo de nuevo.")
-                ExisCleinte = True
+                time.sleep(2)  # Esperar antes de enviar el próximo mensaje
 
-            if message.lower() == "--co":
-                while True:
-                    try:
-                        HOST = input("Ip:")
-                        PORT = int(input("Puerto:"))
+        except KeyboardInterrupt:
+            break  # Salir del bucle si se presiona Ctrl+C
 
-                        client2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                        client2.connect((HOST, PORT))
-                        break  # Si la conexión tiene éxito, salimos del bucle y continuamos con el flujo normal
-                    except socket.gaierror:
-                        print("La dirección IP no es válida o no se puede alcanzar. Inténtelo de nuevo.")
-                    except TimeoutError:
-                        print("El puerto no está disponible o la conexión se ha agotado. Inténtelo de nuevo.")
-                ExisCleinte2 = True
-
-            if message.lower() == "--ex":
-                break
-
-            if ExisCleinte == True:
-                try:
-                    client.send(message.encode('utf-8'))
-                except ConnectionResetError:
-                    print("La conexión fue restablecida por el host remoto.")
-                    client.close
-                    ExisCleinte = False
-                    
-                except ConnectionAbortedError:
-                    print("La conexión fue abortada.")
-                    client.close
-                    ExisCleinte = False
-
-            if ExisCleinte2 == True:
-                try:
-                    client2.send(message.encode('utf-8'))
-                except ConnectionResetError:
-                    print("La conexión fue restablecida por el host remoto.")
-                    client2.close
-                    ExisCleinte2 = False
-                except ConnectionAbortedError:
-                    print("La conexión fue abortada.")
-                    client2.close
-                    ExisCleinte2 = False
-
-            time.sleep(2)  # Espera antes de enviar el próximo mensaje
-
-    finally:
-        # Cerrar la conexión del cliente
-        client.close()
+    # Cerrar todas las conexiones de los clientes
+    for client_socket in clients:
+        client_socket.close()
         
 def detect_servers():
     start_ip = '192.168.2.'
