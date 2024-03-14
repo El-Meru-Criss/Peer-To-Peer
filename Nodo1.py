@@ -10,10 +10,15 @@ def handle_client(client_socket, client_address):
                 print(f"El cliente {client_address} se ha desconectado de forma inesperada.")
                 break
             message = data.decode('utf-8')
-            print(f"Mensaje recibido de {client_address}: {message}")
 
             if message.lower() == "--co":
                 continue
+            elif message.lower() == "--name":
+                client_socket.send("Criss".encode('utf-8'))  # Envía el nombre del servidor al cliente
+                continue
+
+            
+            print(f"Mensaje recibido de {client_address}: {message}")
 
             broadcast(message, client_socket)
 
@@ -66,6 +71,7 @@ def start_server():
 
 def connect_to_server():
     clients = []  # Lista para almacenar los sockets de los clientes
+    error_clients = set()  # Conjunto para registrar los clientes que causaron un error
 
     while True:
         try:
@@ -87,21 +93,27 @@ def connect_to_server():
                 if message.lower() == "--ex":
                     break  # Salir del bucle si el usuario quiere salir
                 elif message.lower() == "--ch":
-                    # Cambiar la conexión del cliente actual
-                    HOST = input("Ip:")
-                    PORT = int(input("Puerto:"))
+                    try:
+                        # Cambiar la conexión del cliente actual
+                        HOST = input("Ip:")
+                        PORT = int(input("Puerto:"))
 
-                    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    client.connect((HOST, PORT))
-                    clients.append(client)  # Agregar el nuevo socket a la lista
-                    continue  # Saltar el resto del bucle para evitar el envío del mensaje
+                        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                        client.connect((HOST, PORT))
+                        clients.append(client)  # Agregar el nuevo socket a la lista
+                    except (socket.gaierror, TimeoutError) as e:
+                        print(f"No se pudo conectar al servidor: {e}")
+                        continue  # Intentar la conexión nuevamente
 
                 # Enviar el mensaje a todos los clientes en la lista
                 for client_socket in clients:
                     try:
                         client_socket.send(message.encode('utf-8'))
-                    except ConnectionError as e:
-                        print(f"Error al enviar el mensaje: {e}")
+                    except Exception as e:
+                        # Verificar si el cliente ya ha causado un error antes
+                        if client_socket not in error_clients:
+                            error_clients.add(client_socket)
+                            print(f"Error al enviar el mensaje a {client_socket.getpeername()}: {e}")
 
                 time.sleep(2)  # Esperar antes de enviar el próximo mensaje
 
@@ -113,13 +125,13 @@ def connect_to_server():
         client_socket.close()
         
 def detect_servers():
-    start_ip = '192.168.2.'
+    start_ip = '192.168.100.'
     start_port = 9990
     end_port = 10005
 
     active_servers = []
 
-    for i in range(135, 159):  # Supongamos que quieres generar direcciones IP del 192.168.100.10 al 192.168.100.19
+    for i in range(10, 20):
         ip = start_ip + str(i)
         for port in range(start_port, end_port + 1):
             server_address = (ip, port)
@@ -127,10 +139,16 @@ def detect_servers():
             s.settimeout(0.1)
             result = s.connect_ex(server_address)
             if result == 0:
-                active_servers.append(server_address)
+                # Establecer conexión exitosa, ahora intenta obtener el nombre del servidor
+                # Solicitar el nombre del servidor
+                s.send("--name".encode('utf-8'))
+                # Recibir el nombre del servidor
+                name = s.recv(1024).decode('utf-8')
+                active_servers.append((ip, port, name))  # Agregar dirección IP, puerto y nombre a la lista
             s.close()
 
     return active_servers
+
 
 
 def main():
@@ -149,7 +167,7 @@ def main():
             if active_servers:
                 print("Servidores activos encontrados:")
                 for server in active_servers:
-                    print(f"- {server[0]}:{server[1]}")
+                    print(f"{server[2]} - {server[0]}:{server[1]}")
 
             else:
                 print("No se encontraron servidores activos en la red local.")
