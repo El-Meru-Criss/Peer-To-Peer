@@ -14,7 +14,7 @@ def handle_client(client_socket, client_address):
             if message.lower() == "--co":
                 continue
             elif message.lower() == "--name":
-                # client_socket.send("Criss".encode('utf-8'))  # Envía el nombre del servidor al cliente
+                client_socket.send("Criss".encode('utf-8'))  # Envía el nombre del servidor al cliente
                 continue
 
             
@@ -54,8 +54,8 @@ def broadcast(message, sender_socket):
             client.send(message.encode('utf-8'))
 
 def start_server():
-    HOST = '192.168.2.158'
-    PORT = 9997
+    HOST = '192.168.2.121'
+    PORT = 9999
 
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((HOST, PORT))
@@ -76,12 +76,16 @@ def connect_to_server():
     while True:
         try:
             HOST = input("Ip:")
-            PORT = int(input("Puerto:"))
+            port_input = input("Puerto:")
+            if not port_input.isdigit():
+                print("El puerto debe ser un número entero.")
+                continue
+            PORT = int(port_input)
 
             client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             client.connect((HOST, PORT))
             clients.append(client)  # Agregar el socket del cliente a la lista
-        except (socket.gaierror, TimeoutError) as e:
+        except (socket.gaierror, TimeoutError, ValueError) as e:
             print(f"No se pudo conectar al servidor: {e}")
             continue  # Intentar la conexión nuevamente
 
@@ -94,14 +98,17 @@ def connect_to_server():
                     break  # Salir del bucle si el usuario quiere salir
                 elif message.lower() == "--ch":
                     try:
-                        # Cambiar la conexión del cliente actual
                         HOST = input("Ip:")
-                        PORT = int(input("Puerto:"))
+                        port_input = input("Puerto:")
+                        if not port_input.isdigit():
+                            print("El puerto debe ser un número entero.")
+                            continue
+                        PORT = int(port_input)
 
                         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                         client.connect((HOST, PORT))
-                        clients.append(client)  # Agregar el nuevo socket a la lista
-                    except (socket.gaierror, TimeoutError) as e:
+                        clients.append(client)  # Agregar el socket del cliente a la lista
+                    except (socket.gaierror, TimeoutError, ValueError) as e:
                         print(f"No se pudo conectar al servidor: {e}")
                         continue  # Intentar la conexión nuevamente
 
@@ -116,7 +123,7 @@ def connect_to_server():
                             print(f"Error al enviar el mensaje a {client_socket.getpeername()}: {e}")
 
                 time.sleep(2)  # Esperar antes de enviar el próximo mensaje
-
+            
         except KeyboardInterrupt:
             break  # Salir del bucle si se presiona Ctrl+C
 
@@ -131,7 +138,7 @@ def detect_servers():
 
     active_servers = []
 
-    for i in range(150, 160):
+    for i in range(121, 160):
         ip = start_ip + str(i)
         for port in range(start_port, end_port + 1):
             server_address = (ip, port)
