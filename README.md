@@ -1,8 +1,4 @@
-<style>
-  b {
-    color:"blue"
-  }
-</style>
+
 
 <center> 
 
