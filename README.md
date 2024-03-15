@@ -1,3 +1,9 @@
+<style>
+  b {
+    color:blue
+  }
+</style>
+
 <center> 
 
   <H1> TUTORIAL PA SUBIR COSAS A ESTE GIT</H1>
