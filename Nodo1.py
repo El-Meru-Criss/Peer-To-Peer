@@ -14,7 +14,7 @@ def handle_client(client_socket, client_address):
             if message.lower() == "--co":
                 continue
             elif message.lower() == "--name":
-                client_socket.send("Criss".encode('utf-8'))  # Envía el nombre del servidor al cliente
+                # client_socket.send("Criss".encode('utf-8'))  # Envía el nombre del servidor al cliente
                 continue
 
             
@@ -54,7 +54,7 @@ def broadcast(message, sender_socket):
             client.send(message.encode('utf-8'))
 
 def start_server():
-    HOST = '192.168.100.19'
+    HOST = '192.168.2.158'
     PORT = 9997
 
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -125,13 +125,13 @@ def connect_to_server():
         client_socket.close()
         
 def detect_servers():
-    start_ip = '192.168.100.'
+    start_ip = '192.168.2.'
     start_port = 9990
     end_port = 10005
 
     active_servers = []
 
-    for i in range(10, 20):
+    for i in range(150, 160):
         ip = start_ip + str(i)
         for port in range(start_port, end_port + 1):
             server_address = (ip, port)
@@ -143,7 +143,11 @@ def detect_servers():
                 # Solicitar el nombre del servidor
                 s.send("--name".encode('utf-8'))
                 # Recibir el nombre del servidor
-                name = s.recv(1024).decode('utf-8')
+                
+                try:
+                    name = s.recv(1024).decode('utf-8')
+                except socket.timeout:
+                    name = "Anonimo"
                 active_servers.append((ip, port, name))  # Agregar dirección IP, puerto y nombre a la lista
             s.close()
 
