@@ -9,7 +9,7 @@
     <li>reconfigure su URL de push usando el Token y la direccion del repositorio, de la siguiente forma:</li>
   </ol>
   <br>
-  git remote set-url origin https://<b>-Tu Id De Token Personal-</b>@github.com/<b>-La URL de tu repositorio en GIT-</b>
+  git remote set-url origin https://<b style="color: royalblue;">-Tu Id De Token Personal-</b>@github.com/<b style="color: royalblue;">-La URL de tu repositorio en GIT-</b>
 
 </center>
 
