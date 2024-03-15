@@ -1,6 +1,6 @@
 <style>
   b {
-    color:blue
+    color:"blue"
   }
 </style>
 
