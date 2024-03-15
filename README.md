@@ -10,5 +10,15 @@
   </ol>
   <br>
   git remote set-url origin https://<b>-Tu Id De Token Personal-</b>@github.com/<b>-La URL de tu repositorio en GIT-</b>
-a
+Comandos:
+<br>
+--ch: para conectar a otro nodo
+<br>
+--ex: para desconectarse de todos los nodos
+<br>
+Opciones:
+<br>
+Opcion 0: sirve para buscar entre un rango de IPs y da como resultado la IP el puerto y el nombre del nodo
+<br>
+Opcion 1: Sirve para conectarse; esta pide una Ip y un puerto.
 </center>
