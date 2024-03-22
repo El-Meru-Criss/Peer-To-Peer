@@ -88,14 +88,14 @@ el comando permite realizar la conexion con otro servidor pear to pear, sin perd
 
 Terminas la conexion con todos los servidores a los que se encuentre conectado el cliente
 
- if message.lower() == "--ex":
+   if message.lower() == "--ex":
                     break  # Salir del bucle si el usuario quiere salir
 
 <H2>COMANDO --name</H2>
 
 Es un comando nos visible, el cual entrega el nombre del servidor a los clientes
 
-elif message.lower() == "--name":
+    elif message.lower() == "--name":
                 client_socket.send("Criss".encode('utf-8'))  # Envía el nombre del servidor al cliente
                 continue
 
