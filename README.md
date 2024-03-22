@@ -37,7 +37,7 @@
 
     return active_servers
 
-    <H2>OPCION 1</H2>
+  <H2>OPCION 1</H2>
     la función 1 es para realizar la conexión con los otros servidores(nodo), ingresando la Ip y el puerto del servidor deseado previamente encontrado con la función 0.
 
     def connect_to_server(): #Conecta los servidores
