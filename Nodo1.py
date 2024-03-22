@@ -2,7 +2,7 @@ import socket #Importa las funciones del socket
 import threading #Importa las funciones de los hilos/tareas para la comunicacion de los participantes
 import time #Importa la funcion que se utiliza para la latencia
 
-def handle_client(client_socket, client_address):
+def handle_client(client_socket, client_address): #Esto sirve para la mensajeria y el uso de comandos internos
     try:
         while True:
             data = client_socket.recv(1024)
@@ -35,7 +35,7 @@ def handle_client(client_socket, client_address):
         except ValueError:
             pass  # Si el socket no está en la lista, no hacer nada
 
-def is_client_connected(client_socket):
+def is_client_connected(client_socket): #Esto sirve para saber si los clientes siguen conectados
     try:
         # Envía un mensaje de latido al cliente y espera una respuesta
         client_socket.send("--hb".encode('utf-8'))
@@ -48,12 +48,12 @@ def is_client_connected(client_socket):
     except socket.timeout:
         return False
 
-def broadcast(message, sender_socket):
+def broadcast(message, sender_socket):# Difunde los mensajes
     for client in clients:
         if client != sender_socket:
             client.send(message.encode('utf-8'))
 
-def start_server():
+def start_server(): #Inicia el servidor
     HOST = '192.168.2.121' # Se utiliza la ip del dispositivo
     PORT = 9999 # Se utiliza el puerto escrito
 
@@ -69,7 +69,7 @@ def start_server():
         client_handler = threading.Thread(target=handle_client, args=(client_socket, client_address))
         client_handler.start()
 
-def connect_to_server():
+def connect_to_server(): #Conecta los servidores
     clients = []  # Lista para almacenar los sockets de los clientes
     error_clients = set()  # Conjunto para registrar los clientes que causaron un error
 
