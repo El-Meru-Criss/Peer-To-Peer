@@ -1,13 +1,13 @@
-import socket
-import threading
-import time
+import socket #Importa las funciones del socket
+import threading #Importa las funciones de los hilos/tareas para la comunicacion de los participantes
+import time #Importa la funcion que se utiliza para la latencia
 
 def handle_client(client_socket, client_address):
     try:
         while True:
             data = client_socket.recv(1024)
             if not data:
-                print(f"El cliente {client_address} se ha desconectado de forma inesperada.")
+                print(f"El cliente {client_address} se ha desconectado de forma inesperada.") # Mensaje de desconexión
                 break
             message = data.decode('utf-8')
 
@@ -54,8 +54,8 @@ def broadcast(message, sender_socket):
             client.send(message.encode('utf-8'))
 
 def start_server():
-    HOST = '192.168.2.121'
-    PORT = 9999
+    HOST = '192.168.2.121' # Se utiliza la ip del dispositivo
+    PORT = 9999 # Se utiliza el puerto escrito
 
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((HOST, PORT))
@@ -131,14 +131,14 @@ def connect_to_server():
     for client_socket in clients:
         client_socket.close()
         
-def detect_servers():
-    start_ip = '192.168.2.'
-    start_port = 9990
-    end_port = 10005
+def detect_servers(): # Función para detectar en un rango de servidores
+    start_ip = '192.168.2.' #Ip inicial para la detección
+    start_port = 9990 #Puerto inicial para la detección
+    end_port = 10005 #Puerto final para la detección
 
     active_servers = []
 
-    for i in range(121, 160):
+    for i in range(121, 160): # Rango del ultimo tramo de las Ips
         ip = start_ip + str(i)
         for port in range(start_port, end_port + 1):
             server_address = (ip, port)
@@ -162,18 +162,18 @@ def detect_servers():
 
 
 
-def main():
+def main(): #Menu principal
     choice = 0
 
-    while choice != 1:
+    while choice != 1: #ciclo para la elección de funciones
         print("Presione 1 para conectarse. 0 para buscar")
         choice = input("Ingrese su elección: ")
 
         if choice == "1":
-            connect_to_server()
+            connect_to_server() #Ejecuta la conexión del servidor
         elif choice == "0":
             print("Buscando servidores peer-to-peer activos en la red local...")
-            active_servers = detect_servers()
+            active_servers = detect_servers() #Ejecuta la detección de los servidores
 
             if active_servers:
                 print("Servidores activos encontrados:")
@@ -189,7 +189,7 @@ def main():
 if __name__ == "__main__":
     clients = []
 
-    server_thread = threading.Thread(target=start_server)
-    server_thread.start()
+    server_thread = threading.Thread(target=start_server) #esto ayuda a la ejecución del servidor en segundo plano
+    server_thread.start() #esto ayuda a la ejecución del servidor en segundo plano
 
     main()
