@@ -88,7 +88,7 @@ el comando permite realizar la conexion con otro servidor pear to pear, sin perd
 
 Terminas la conexion con todos los servidores a los que se encuentre conectado el cliente
 
-   if message.lower() == "--ex":
+     if message.lower() == "--ex":
                     break  # Salir del bucle si el usuario quiere salir
 
 <H2>COMANDO --name</H2>
